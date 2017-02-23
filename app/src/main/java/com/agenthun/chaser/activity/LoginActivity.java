@@ -28,7 +28,6 @@ import com.agenthun.chaser.connectivity.manager.RetrofitManager;
 import com.agenthun.chaser.connectivity.service.PathType;
 import com.agenthun.chaser.utils.NetUtil;
 import com.agenthun.chaser.utils.PreferencesHelper;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MobclickAgent.onResume(this);
         assureUserInit();
         if (mUser == null || isInSaveMode()) {
             initContents();
@@ -93,12 +91,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         //after andrioid m, must request Permission on runtime
         getPermissions(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        MobclickAgent.onPause(this);
     }
 
     @Override
@@ -134,8 +126,6 @@ public class LoginActivity extends AppCompatActivity {
         if (NetUtil.isConnected(this)) { //已连接网络
             String name = mUser.getUsername();
             String password = mUser.getPassword();
-
-            MobclickAgent.onProfileSignIn(name);
 
             getProgressDialog().show();
 

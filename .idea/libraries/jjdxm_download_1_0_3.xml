@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="jjdxm-download-1.0.3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/versionupdate/build/intermediates/exploded-aar/com.dou361.download/jjdxm-download/1.0.3/res" />
+      <root url="jar://$PROJECT_DIR$/versionupdate/build/intermediates/exploded-aar/com.dou361.download/jjdxm-download/1.0.3/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dou361.download/jjdxm-download/1.0.3/136241b469417af73d1e7c73d34ca2672e8c65bb/jjdxm-download-1.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

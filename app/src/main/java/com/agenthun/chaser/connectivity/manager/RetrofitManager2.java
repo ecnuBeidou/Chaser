@@ -10,6 +10,7 @@ import com.agenthun.chaser.bean.DeviceLocationInfos;
 import com.agenthun.chaser.bean.User;
 import com.agenthun.chaser.bean.base.BeidouMasterDevice;
 import com.agenthun.chaser.bean.base.DeviceLocation;
+import com.agenthun.chaser.bean.base.LatLng;
 import com.agenthun.chaser.bean.base.LocationDetail;
 import com.agenthun.chaser.bean.base.Result;
 import com.agenthun.chaser.bean.updateByRetrofit.UpdateResponse;
@@ -20,8 +21,6 @@ import com.agenthun.chaser.connectivity.service.FreightTrackWebService;
 import com.agenthun.chaser.connectivity.service.PathType;
 import com.agenthun.chaser.utils.DeviceSearchSuggestion;
 import com.agenthun.chaser.utils.LanguageUtil;
-import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.utils.CoordinateConverter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -385,10 +384,6 @@ public class RetrofitManager2 {
                 if (deviceLocationInfos != null
                         && deviceLocationInfos.getResult().get(0).getRESULT() == 1) {
 
-                    //GPS坐标转百度地图坐标
-                    CoordinateConverter converter = new CoordinateConverter();
-                    converter.from(CoordinateConverter.CoordType.GPS);
-
                     for (DeviceLocation deviceLocation :
                             deviceLocationInfos.getDetails()) {
                         String reportTime = deviceLocation.getReportTime();
@@ -400,8 +395,6 @@ public class RetrofitManager2 {
                                 Double.parseDouble(location[0]),
                                 Double.parseDouble(location[1])
                         );
-                        converter.coord(latLng);
-                        latLng = converter.convert();
 
                         LocationDetail d = new LocationDetail(reportTime,
                                 uploadType,
