@@ -19,5 +19,7 @@ public enum PathType {
     //APP 版本检测更新
     ESeal_UPDATE_SERVICE_URL,
     //APP Lite 版本检测更新
-    ESeal_LITE_UPDATE_SERVICE_URL
+    ESeal_LITE_UPDATE_SERVICE_URL,
+    //APP 追踪者 版本检测更新
+    CHASER_UPDATE_SERVICE_URL
 }

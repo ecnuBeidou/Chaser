@@ -182,6 +182,14 @@ public interface FreightTrackWebService {
     @GET(Api.ESeal_LITE_UPDATE_SERVICE_URL)
     Observable<UpdateResponse> checkAppLiteUpdate();
 
+    //APP 追踪者 版本检测更新
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json"
+    })
+    @GET(Api.CHASER_UPDATE_SERVICE_URL)
+    Observable<UpdateResponse> checkAppChaserUpdate();
+
     //下载APK文件
     @Streaming
     @GET

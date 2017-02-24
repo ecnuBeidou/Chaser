@@ -19,11 +19,14 @@ import com.agenthun.chaser.connectivity.manager.cookie.CookieJarManager;
 import com.agenthun.chaser.connectivity.service.Api;
 import com.agenthun.chaser.connectivity.service.FreightTrackWebService;
 import com.agenthun.chaser.connectivity.service.PathType;
+import com.agenthun.chaser.utils.DataLogUtils;
 import com.agenthun.chaser.utils.DeviceSearchSuggestion;
 import com.agenthun.chaser.utils.LanguageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -142,6 +145,8 @@ public class RetrofitManager2 {
                 return Api.ESeal_UPDATE_SERVICE_URL;
             case ESeal_LITE_UPDATE_SERVICE_URL:
                 return Api.ESeal_LITE_UPDATE_SERVICE_URL;
+            case CHASER_UPDATE_SERVICE_URL:
+                return Api.CHASER_UPDATE_SERVICE_URL;
         }
         return "";
     }
@@ -283,53 +288,17 @@ public class RetrofitManager2 {
      */
     //根据Token获取所有在途中的货物设置信息
     public Observable<List<DeviceSearchSuggestion>> getAllDeviceFreightListObservable(String token) {
-        Observable<BleAndBeidouNfcDeviceInfos> bleAndBeidouNfcDeviceInfos = RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST)
-                .getBleAndBeidouNfcDeviceFreightListObservable(token);
-        Observable<BeidouMasterDeviceInfos> beidouMasterDeviceInfos = RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST)
-                .getBeidouMasterDeviceFreightListObservable(token);
+        BeidouMasterDevice detail = new BeidouMasterDevice("11006");
+        DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail);
 
-        return Observable.zip(bleAndBeidouNfcDeviceInfos, beidouMasterDeviceInfos, new Func2<BleAndBeidouNfcDeviceInfos, BeidouMasterDeviceInfos, List<DeviceSearchSuggestion>>() {
-            @Override
-            public List<DeviceSearchSuggestion> call(BleAndBeidouNfcDeviceInfos bleAndBeidouNfcDeviceInfos, BeidouMasterDeviceInfos beidouMasterDeviceInfos) {
-                List<DeviceSearchSuggestion> result = new ArrayList<DeviceSearchSuggestion>();
-
-/*                if (bleAndBeidouNfcDeviceInfos != null &&
-                        bleAndBeidouNfcDeviceInfos.getResult().get(0).getRESULT() == 1) {
-                    List<BleAndBeidouNfcDevice> details = bleAndBeidouNfcDeviceInfos.getDetails();
-                    for (BleAndBeidouNfcDevice detail :
-                            details) {
-                        Log.d(TAG, "getBleAndBeidouNfcDevice(): " + detail.toString());
-                        if (detail.getDeviceType().equals(Api.DEVICE_TYPE_BLE)) {
-                            DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail,
-                                    DeviceSearchSuggestion.DEVICE_BLE);
-                            result.add(suggestion);
-                        } else if (detail.getDeviceType().equals(Api.DEVICE_TYPE_BEIDOU_NFC)) {
-                            DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail,
-                                    DeviceSearchSuggestion.DEVICE_BEIDOU_NFC);
-                            result.add(suggestion);
-                        }
-                    }
-                }*/
-
-                if (beidouMasterDeviceInfos != null
-                        && beidouMasterDeviceInfos.getResult().get(0).getRESULT() == 1) {
-                    List<BeidouMasterDevice> details = beidouMasterDeviceInfos.getDetails();
-                    for (BeidouMasterDevice detail :
-                            details) {
-                        Log.d(TAG, "getBeidouMasterDevice(): " + detail.toString());
-                        DeviceSearchSuggestion suggestion = new DeviceSearchSuggestion(detail);
-                        result.add(suggestion);
-                    }
-                }
-
-                return result;
-            }
-        });
+        return Observable
+                .just(Arrays.asList(suggestion))
+                .delay(500, TimeUnit.MILLISECONDS);
     }
 
     //根据Token获取该货物的最新位置状态
     public Observable<LocationDetail> getFreightLocationObservable(String token, String id) {
-        Observable<DeviceLocationInfos> deviceLocationInfos = freightTrackWebService.getBeidouMasterDeviceLastLocation(token, id, LanguageUtil.getLanguage());
+/*        Observable<DeviceLocationInfos> deviceLocationInfos = freightTrackWebService.getBeidouMasterDeviceLastLocation(token, id, LanguageUtil.getLanguage());
 
         return deviceLocationInfos.map(new Func1<DeviceLocationInfos, LocationDetail>() {
             @Override
@@ -364,17 +333,39 @@ public class RetrofitManager2 {
                 }
                 return null;
             }
-        });
+        });*/
 
 /*        //构造测试数据
         return Observable
                 .just(new LocationDetail("2017/02/14 13:14:51", "0", "1", "1", new LatLng(45.6406300000, -73.8472210000)))
                 .delay(500, TimeUnit.MILLISECONDS);*/
+        List<LocationDetail> list = new ArrayList<>();
+
+        byte[] buffer = DataLogUtils.FileToBytes(DataLogUtils.DATA_LOG_FILE_NAME);
+        String[] dataStr = new String(buffer).split("\r\n");
+
+        String[] tmp = dataStr[dataStr.length - 1].split(" ");
+        if (DataLogUtils.LOCATION_TYPE.equals(tmp[0])) {
+            String reportTime = tmp[1] + " " + tmp[2];
+
+            String uploadType = tmp[7];
+            String securityLevel = tmp[8];
+            String closedFlag = tmp[9];
+
+            double lat = Double.parseDouble(tmp[3]);
+            double lng = Double.parseDouble(tmp[5]);
+            LatLng latLng = new LatLng(lat, lng);
+            LocationDetail detail = new LocationDetail(reportTime, uploadType, securityLevel, closedFlag, latLng);
+
+            return Observable.just(detail);
+        }
+
+        return Observable.empty();
     }
 
     //根据Token获取该货物所选时间段的位置状态列表
     public Observable<List<LocationDetail>> getFreightLocationListObservable(String token, String id, String from, String to) {
-        Observable<DeviceLocationInfos> deviceLocationInfos = RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST)
+/*        Observable<DeviceLocationInfos> deviceLocationInfos = RetrofitManager2.builder(PathType.WEB_SERVICE_V2_TEST)
                 .getBeidouMasterDeviceLocationObservable(token, id, from, to);
 
         return deviceLocationInfos.map(new Func1<DeviceLocationInfos, List<LocationDetail>>() {
@@ -406,11 +397,10 @@ public class RetrofitManager2 {
                 }
                 return list;
             }
-        });
+        });*/
 
-/*
         //构造测试数据
-        List<LocationDetail> list = new ArrayList<>();
+/*        List<LocationDetail> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             LocationDetail detail = new LocationDetail("2017/02/14 13:14:51", "0", String.valueOf(2), "1", new LatLng(45.6406300000 + Math.cos(i / 39.9f), -73.8472210000 + Math.cos(i / 99.9f)));
             list.add(detail);
@@ -418,6 +408,34 @@ public class RetrofitManager2 {
         return Observable
                 .just(list)
                 .delay(3000, TimeUnit.MILLISECONDS);*/
+        List<LocationDetail> list = new ArrayList<>();
+
+        byte[] buffer = DataLogUtils.FileToBytes(DataLogUtils.DATA_LOG_FILE_NAME);
+        String[] dataStr = new String(buffer).split("\r\n");
+
+        for (String d :
+                dataStr) {
+            String[] tmp = d.split(" ");
+            if (DataLogUtils.LOCATION_TYPE.equals(tmp[0])) {
+                String reportTime = tmp[1] + " " + tmp[2];
+
+                String uploadType = tmp[7];
+                String securityLevel = tmp[8];
+                String closedFlag = tmp[9];
+
+                double lat = Double.parseDouble(tmp[3]);
+                double lng = Double.parseDouble(tmp[5]);
+                LatLng latLng = new LatLng(lat, lng);
+                LocationDetail detail = new LocationDetail(reportTime, uploadType, securityLevel, closedFlag, latLng);
+
+                list.add(detail);
+            }
+        }
+
+        Collections.reverse(list); //按时间倒序
+
+        return Observable
+                .just(list);
     }
 
     //APP 版本检测更新
@@ -443,6 +461,26 @@ public class RetrofitManager2 {
     //APP Lite 版本检测更新
     public Observable<UpdateResponse.Entity> checkAppLiteUpdateObservable() {
         Observable<UpdateResponse> response = freightTrackWebService.checkAppLiteUpdate();
+        return response.map(new Func1<UpdateResponse, UpdateResponse.Entity>() {
+            @Override
+            public UpdateResponse.Entity call(UpdateResponse updateResponse) {
+                if (updateResponse == null) {
+                    return null;
+                }
+                if (updateResponse.getError() == null || updateResponse.getError().getResult() != 1) {
+                    return null;
+                }
+                if (updateResponse.getEntity() != null) {
+                    return updateResponse.getEntity();
+                }
+                return null;
+            }
+        });
+    }
+
+    //APP 追踪者 版本检测更新
+    public Observable<UpdateResponse.Entity> checkAppChaserUpdateObservable() {
+        Observable<UpdateResponse> response = freightTrackWebService.checkAppChaserUpdate();
         return response.map(new Func1<UpdateResponse, UpdateResponse.Entity>() {
             @Override
             public UpdateResponse.Entity call(UpdateResponse updateResponse) {

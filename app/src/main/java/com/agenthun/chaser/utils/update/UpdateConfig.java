@@ -27,7 +27,7 @@ public class UpdateConfig {
     public static void initGet(final Context context) {
         UpdateHelper.init(context);
 
-        String url = "http://www.freight-track.com/update/updatecheck3.aspx";
+        String url = "http://www.freight-track.com/update/updatecheck4.aspx";
         UpdateHelper.getInstance()
                 .setMethod(RequestType.get)
                 .setCheckUrl(url)

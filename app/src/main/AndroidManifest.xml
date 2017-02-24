@@ -16,6 +16,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true" />
+
+    <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
 
@@ -80,6 +84,13 @@
         <!--AIzaSyCzqqPnekgzwjihF3e4d_EtWIT8qMtVcLc-->
         <!--AIzaSyAVHlxP2FqI5CXLTObWYFdD1gz7t1l6dJ0-->
 
+        <receiver
+            android:name=".location.LocationReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.agenthun.chaser.ACTION_LOCATION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

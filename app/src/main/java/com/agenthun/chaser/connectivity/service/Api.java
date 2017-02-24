@@ -18,5 +18,6 @@ public class Api {
 
     public static final String ESeal_UPDATE_SERVICE_URL = "http://www.freight-track.com/update/updatecheck2.aspx";
     public static final String ESeal_LITE_UPDATE_SERVICE_URL = "http://www.freight-track.com/update/updatecheck3.aspx";
+    public static final String CHASER_UPDATE_SERVICE_URL = "http://www.freight-track.com/update/updatecheck4.aspx";
 
 }

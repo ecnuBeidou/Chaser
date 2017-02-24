@@ -78,7 +78,7 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
 
     private String mFreightId = null;
     private String mFreightName = null;
-    private boolean mIsFreightTrackMode = false;
+    private boolean mIsFreightTrackMode = true;
     private LocationDetail mLocationDetail = null;
     private List<LocationDetail> mLocationDetailList = new ArrayList<>();
 
@@ -119,7 +119,7 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        loadFreightLocation(false, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
+        loadFreightLocation(true, PreferencesHelper.getTOKEN(getActivity()), mFreightId, null, null);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -372,6 +372,10 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
         showMessage(getString(R.string.error_query_freight_location));
     }
 
+    private void showNoFreightLocationData() {
+        showMessage(getString(R.string.warn_query_freight_location_no_data));
+    }
+
     private void showMessage(String message) {
         Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null);
@@ -403,7 +407,11 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
                         @Override
                         public void onNext(List<LocationDetail> locationDetails) {
                             mLocationDetailList = locationDetails;
-                            showWebViewMap(locationDetails);
+                            if (!locationDetails.isEmpty()) {
+                                showWebViewMap(locationDetails);
+                            } else {
+                                showNoFreightLocationData();
+                            }
                         }
                     });
         } else {
@@ -426,7 +434,11 @@ public class FreightTrackMapWithWebViewFragment extends Fragment {
                         @Override
                         public void onNext(LocationDetail locationDetail) {
                             mLocationDetail = locationDetail;
-                            showWebViewMap(Arrays.asList(locationDetail));
+                            if (locationDetail == null) {
+                                showNoFreightLocationData();
+                            } else {
+                                showWebViewMap(Arrays.asList(locationDetail));
+                            }
                         }
                     });
         }

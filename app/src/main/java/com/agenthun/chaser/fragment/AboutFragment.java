@@ -209,7 +209,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void checkUpdateVersion(final boolean auto) {
-        RetrofitManager2.builder(PathType.ESeal_LITE_UPDATE_SERVICE_URL).checkAppLiteUpdateObservable()
+        RetrofitManager2.builder(PathType.CHASER_UPDATE_SERVICE_URL).checkAppChaserUpdateObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
